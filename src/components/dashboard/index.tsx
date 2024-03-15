@@ -1,9 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import "./style.css";
 
 import Highcharts from "highcharts";
 import Dashboards, { Board } from "@highcharts/dashboards";
 import DataGrid from "@highcharts/dashboards/datagrid";
 import LayoutModule from "@highcharts/dashboards/modules/layout";
+import {
+  HIGH_CHART_LAYOUT_KEY,
+  dashboardConfig,
+} from "../../constants/dashboard";
 
 LayoutModule(Dashboards);
 
@@ -13,289 +18,42 @@ Dashboards.DataGridPlugin.custom.connectDataGrid(DataGrid);
 Dashboards.PluginHandler.addPlugin(Dashboards.HighchartsPlugin);
 Dashboards.PluginHandler.addPlugin(Dashboards.DataGridPlugin);
 
-const config: Board.Options = {
-  dataPool: {
-    connectors: [
-      {
-        id: "micro-element",
-        type: "JSON",
-        options: {
-          firstRowAsNames: false,
-          columnNames: ["Food", "Vitamin A", "Iron"],
-          data: [
-            ["Beef Liver", 6421, 6.5],
-            ["Lamb Liver", 2122, 6.5],
-            ["Cod Liver Oil", 1350, 0.9],
-            ["Mackerel", 388, 1],
-            ["Tuna", 214, 0.6],
-          ],
-        },
-      },
-    ],
-  },
-  editMode: {
-    enabled: true,
-    contextMenu: {
-      enabled: true,
-      items: ["editMode"],
-    },
-  },
-  gui: {
-    layouts: [
-      {
-        rows: [
-          {
-            cells: [
-              {
-                id: "kpi-wrapper",
-                layout: {
-                  rows: [
-                    {
-                      cells: [
-                        {
-                          id: "kpi-vitamin-a",
-                        },
-                        {
-                          id: "kpi-iron",
-                        },
-                      ],
-                    },
-                  ],
-                },
-              },
-              {
-                id: "dashboard-col-0",
-              },
-              {
-                id: "dashboard-col-1",
-              },
-            ],
-          },
-          {
-            cells: [
-              {
-                id: "dashboard-col-2",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  components: [
-    {
-      type: "KPI",
-      cell: "kpi-vitamin-a",
-      value: 900,
-      valueFormat: "{value}",
-      title: "Vitamin A",
-      subtitle: "daily recommended dose",
-    },
-    {
-      type: "KPI",
-      cell: "kpi-iron",
-      value: 8,
-      title: "Iron",
-      valueFormat: "{value}",
-      subtitle: "daily recommended dose",
-    },
-    {
-      cell: "title",
-      type: "HTML",
-      elements: [
-        {
-          tagName: "h1",
-          textContent: "MicroElement amount in Foods",
-        },
-      ],
-    },
-    {
-      sync: {
-        visibility: true,
-        highlight: true,
-        extremes: true,
-      },
-      connector: {
-        id: "micro-element",
-      },
-      cell: "dashboard-col-0",
-      type: "Highcharts",
-      columnAssignment: {
-        Food: "x",
-        "Vitamin A": "value",
-      },
-      chartOptions: {
-        xAxis: {
-          type: "category",
-          accessibility: {
-            description: "Groceries",
-          },
-        },
-        yAxis: {
-          title: {
-            text: "mcg",
-          },
-          plotLines: [
-            {
-              value: 900,
-              zIndex: 7,
-              dashStyle: "ShortDash",
-              label: {
-                text: "RDA",
-                align: "right",
-                style: {
-                  color: "#B73C28",
-                },
-              },
-            },
-          ],
-        },
-        credits: {
-          enabled: false,
-        },
-        plotOptions: {
-          series: {
-            marker: {
-              radius: 6,
-            },
-          },
-        },
-        legend: {
-          enabled: true,
-          verticalAlign: "top",
-        },
-        chart: {
-          animation: false,
-          type: "column",
-          spacing: [30, 30, 30, 20],
-        },
-        title: {
-          text: "",
-        },
-        tooltip: {
-          valueSuffix: " mcg",
-          stickOnContact: true,
-        },
-        lang: {
-          accessibility: {
-            chartContainerLabel:
-              "Vitamin A in food. Highcharts Interactive Chart.",
-          },
-        },
-        accessibility: {
-          description: `The chart is displaying the Vitamin A amount in
-              micrograms for some groceries. There is a plotLine demonstrating
-              the daily Recommended Dietary Allowance (RDA) of 900
-              micrograms.`,
-          point: {
-            valueSuffix: " mcg",
-          },
-        },
-      },
-    },
-    {
-      cell: "dashboard-col-1",
-      sync: {
-        visibility: true,
-        highlight: true,
-        extremes: true,
-      },
-      connector: {
-        id: "micro-element",
-      },
-      type: "Highcharts",
-      columnAssignment: {
-        Food: "x",
-        Iron: "y",
-      },
-      chartOptions: {
-        xAxis: {
-          type: "category",
-          accessibility: {
-            description: "Groceries",
-          },
-        },
-        yAxis: {
-          title: {
-            text: "mcg",
-          },
-          max: 8,
-          plotLines: [
-            {
-              value: 8,
-              dashStyle: "ShortDash",
-              label: {
-                text: "RDA",
-                align: "right",
-                style: {
-                  color: "#B73C28",
-                },
-              },
-            },
-          ],
-        },
-        credits: {
-          enabled: false,
-        },
-        plotOptions: {
-          series: {
-            marker: {
-              radius: 6,
-            },
-          },
-        },
-        title: {
-          text: "",
-        },
-        legend: {
-          enabled: true,
-          verticalAlign: "top",
-        },
-        chart: {
-          animation: false,
-          type: "column",
-          spacing: [30, 30, 30, 20],
-        },
-        tooltip: {
-          valueSuffix: " mcg",
-          stickOnContact: true,
-        },
-        lang: {
-          accessibility: {
-            chartContainerLabel: "Iron in food. Highcharts Interactive Chart.",
-          },
-        },
-        accessibility: {
-          description: `The chart is displaying the Iron amount in
-              micrograms for some groceries. There is a plotLine demonstrating
-              the daily Recommended Dietary Allowance (RDA) of 8
-              micrograms.`,
-          point: {
-            valueSuffix: " mcg",
-          },
-        },
-      },
-    },
-    {
-      cell: "dashboard-col-2",
-      connector: {
-        id: "micro-element",
-      },
-      type: "DataGrid",
-      sync: {
-        highlight: true,
-        visibility: true,
-      },
-    },
-  ],
-};
-
 const Dashboard = () => {
+  const boardRef = useRef<Board | null>(null);
   useEffect(() => {
-    Dashboards.board("container", config);
+    const boardOption = localStorage.getItem(HIGH_CHART_LAYOUT_KEY);
+    const board = Dashboards.board(
+      "container",
+      boardOption ? JSON.parse(boardOption) : dashboardConfig
+    );
+    board.importLayoutLocal(HIGH_CHART_LAYOUT_KEY);
+    boardRef.current = board;
   }, []);
 
-  return <div id="container" />;
+  const setToggle = () => {
+    if (boardRef.current) {
+      const isEditMode = boardRef.current.editMode?.isActive();
+
+      if (isEditMode) {
+        boardRef.current.editMode?.deactivate();
+        const boardOption = boardRef.current?.getOptions();
+        localStorage.setItem(
+          HIGH_CHART_LAYOUT_KEY,
+          JSON.stringify(boardOption)
+        );
+        boardRef.current.exportLocal();
+      } else {
+        boardRef.current.editMode?.activate();
+      }
+    }
+  };
+
+  return (
+    <>
+      <button onClick={() => setToggle()}>Toggle Edit Mode</button>
+      <div id="container" />
+    </>
+  );
 };
 
 export default Dashboard;
