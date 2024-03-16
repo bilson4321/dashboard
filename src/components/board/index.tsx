@@ -18,7 +18,7 @@ Dashboards.DataGridPlugin.custom.connectDataGrid(DataGrid);
 Dashboards.PluginHandler.addPlugin(Dashboards.HighchartsPlugin);
 Dashboards.PluginHandler.addPlugin(Dashboards.DataGridPlugin);
 
-const Dashboard = () => {
+const HighChartDashboard = () => {
   const boardRef = useRef<Board | null>(null);
   useEffect(() => {
     const boardOption = localStorage.getItem(HIGH_CHART_LAYOUT_KEY);
@@ -56,4 +56,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default HighChartDashboard;
