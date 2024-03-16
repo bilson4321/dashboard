@@ -7,8 +7,8 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
   return (
-    <div className="p-2">
+    <>
       <HighChartDashboard />
-    </div>
+    </>
   );
 }

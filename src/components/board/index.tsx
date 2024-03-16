@@ -50,7 +50,14 @@ const HighChartDashboard = () => {
 
   return (
     <>
-      <button onClick={() => setToggle()}>Toggle Edit Mode</button>
+      <div className="flex justify-end p-4">
+        <button
+          onClick={setToggle}
+          className="bg-blue-500 text-white p-2 rounded-lg"
+        >
+          Toggle Edit
+        </button>
+      </div>
       <div id="container" />
     </>
   );
