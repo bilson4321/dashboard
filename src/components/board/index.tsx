@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./style.css";
 
 import Highcharts from "highcharts";
@@ -10,6 +10,8 @@ import {
   dashboardConfig,
 } from "../../constants/dashboard";
 import { DataPoolConnectorOptions } from "@highcharts/dashboards/es-modules/Data/DataPoolOptions";
+import { ToggleSwitch } from "flowbite-react";
+import { getDataGridConfig } from "../../constants/highchart";
 
 LayoutModule(Dashboards);
 
@@ -25,12 +27,11 @@ interface HighChartDashboardProps {
 const HighChartDashboard = (props: HighChartDashboardProps) => {
   const { dataPoolOptions } = props;
   const boardRef = useRef<Board | null>(null);
+
+  const [isEditMode, setIsEditMode] = useState(false);
+
   useEffect(() => {
     const boardOption = localStorage.getItem(HIGH_CHART_LAYOUT_KEY);
-    console.log(
-      "boardOption",
-      boardOption ? JSON.parse(boardOption) : dashboardConfig
-    );
     const board = Dashboards.board(
       "container",
       boardOption ? JSON.parse(boardOption) : dashboardConfig
@@ -52,19 +53,6 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
       boardRef.current?.dataPool.getConnectorIds() ?? [];
     if (boardComponents.length === 0 && dataPoolConnectors.length > 0) {
       boardRef.current?.setComponents([
-        {
-          sync: {
-            visibility: true,
-            highlight: true,
-            extremes: true,
-          },
-          cell: HIGH_CHART_LAYOUT_KEY + 0 + 1,
-          id: "rocket-data",
-          type: "DataGrid",
-          connector: {
-            id: "rocket-data",
-          },
-        },
         {
           sync: {
             visibility: true,
@@ -100,18 +88,8 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
             },
           },
         },
-        {
-          connector: {
-            id: "dragon-data",
-          },
-          cell: HIGH_CHART_LAYOUT_KEY + 1 + 0,
-          type: "DataGrid",
-          sync: {
-            visibility: true,
-            highlight: true,
-            extremes: true,
-          },
-        },
+        getDataGridConfig(HIGH_CHART_LAYOUT_KEY + 0 + 1, "rocket-data"),
+        getDataGridConfig(HIGH_CHART_LAYOUT_KEY + 1 + 0, "dragon-data"),
       ]);
     }
   }, []);
@@ -127,8 +105,10 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
           HIGH_CHART_LAYOUT_KEY,
           JSON.stringify(boardOption)
         );
+        setIsEditMode(false);
       } else {
         boardRef.current.editMode?.activate();
+        setIsEditMode(true);
       }
     }
   };
@@ -136,12 +116,12 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
   return (
     <>
       <div className="flex justify-end p-4">
-        <button
-          onClick={setToggle}
-          className="bg-blue-500 text-white p-2 rounded-lg"
-        >
-          Toggle Edit
-        </button>
+        <ToggleSwitch
+          checked={isEditMode}
+          id="toggle"
+          label="Edit Mode"
+          onChange={setToggle}
+        />
       </div>
       <div id="container" />
     </>
