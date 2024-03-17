@@ -9,6 +9,7 @@ import {
   HIGH_CHART_LAYOUT_KEY,
   dashboardConfig,
 } from "../../constants/dashboard";
+import { AllRocketsQuery } from "../../gql/graphql";
 
 LayoutModule(Dashboards);
 
@@ -18,7 +19,11 @@ Dashboards.DataGridPlugin.custom.connectDataGrid(DataGrid);
 Dashboards.PluginHandler.addPlugin(Dashboards.HighchartsPlugin);
 Dashboards.PluginHandler.addPlugin(Dashboards.DataGridPlugin);
 
-const HighChartDashboard = () => {
+interface HighChartDashboardProps {
+  data?: AllRocketsQuery;
+}
+const HighChartDashboard = (props: HighChartDashboardProps) => {
+  const { data } = props;
   const boardRef = useRef<Board | null>(null);
   useEffect(() => {
     const boardOption = localStorage.getItem(HIGH_CHART_LAYOUT_KEY);
@@ -29,6 +34,22 @@ const HighChartDashboard = () => {
     board.importLayoutLocal(HIGH_CHART_LAYOUT_KEY);
     boardRef.current = board;
   }, []);
+
+  useEffect(() => {
+    if (boardRef.current) {
+      boardRef.current.dataPool?.setConnectorOptions({
+        id: "rocket-data",
+        type: "JSON",
+        options: {
+          data:
+            data?.rockets?.map((rocket) => [
+              rocket?.name ?? "",
+              rocket?.cost_per_launch ?? 0,
+            ]) ?? [],
+        },
+      });
+    }
+  }, [data]);
 
   const setToggle = () => {
     if (boardRef.current) {

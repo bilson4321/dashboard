@@ -6,6 +6,7 @@ export const Route = createLazyFileRoute("/")({
 
 function Login() {
   const navigate = useNavigate({ from: "/" });
+
   return (
     <div className="container mx-auto">
       <div className="flex justify-center items-center h-screen">
