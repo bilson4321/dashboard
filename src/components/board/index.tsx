@@ -47,63 +47,73 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
   }, [dataPoolOptions]);
 
   useEffect(() => {
-    boardRef.current?.setComponents([
-      {
-        sync: {
-          visibility: true,
-          highlight: true,
-          extremes: true,
-        },
-        cell: HIGH_CHART_LAYOUT_KEY + 0 + 1,
-        id: "rocket-data",
-        type: "DataGrid",
-        connector: {
+    const boardComponents = boardRef.current?.mountedComponents ?? [];
+    const dataPoolConnectors =
+      boardRef.current?.dataPool.getConnectorIds() ?? [];
+    if (boardComponents.length === 0 && dataPoolConnectors.length > 0) {
+      boardRef.current?.setComponents([
+        {
+          sync: {
+            visibility: true,
+            highlight: true,
+            extremes: true,
+          },
+          cell: HIGH_CHART_LAYOUT_KEY + 0 + 1,
           id: "rocket-data",
-        },
-      },
-      {
-        connector: {
-          id: "rocket-data",
-        },
-        cell: HIGH_CHART_LAYOUT_KEY + 0 + 0,
-        type: "Highcharts",
-        columnAssignment: {
-          Name: "x",
-          Cost: "value",
-        },
-        chartOptions: {
-          title: {
-            text: "Rocket Cost",
+          type: "DataGrid",
+          connector: {
+            id: "rocket-data",
           },
-          subtitle: {
-            text: "Rocket cost per launch with payload weight",
+        },
+        {
+          sync: {
+            visibility: true,
+            highlight: true,
+            extremes: true,
           },
-          xAxis: {
-            type: "category",
-            accessibility: {
-              description: "Rockets",
-            },
+          connector: {
+            id: "rocket-data",
           },
-          yAxis: {
+          cell: HIGH_CHART_LAYOUT_KEY + 0 + 0,
+          type: "Highcharts",
+          columnAssignment: {
+            Name: "x",
+            Cost: "value",
+          },
+          chartOptions: {
             title: {
-              text: "USD",
+              text: "Rocket Cost",
+            },
+            subtitle: {
+              text: "Rocket cost per launch with payload weight",
+            },
+            xAxis: {
+              type: "category",
+              accessibility: {
+                description: "Rockets",
+              },
+            },
+            yAxis: {
+              title: {
+                text: "USD",
+              },
             },
           },
         },
-      },
-      {
-        connector: {
-          id: "dragon-data",
+        {
+          connector: {
+            id: "dragon-data",
+          },
+          cell: HIGH_CHART_LAYOUT_KEY + 1 + 0,
+          type: "DataGrid",
+          sync: {
+            visibility: true,
+            highlight: true,
+            extremes: true,
+          },
         },
-        cell: HIGH_CHART_LAYOUT_KEY + 1 + 0,
-        type: "DataGrid",
-        sync: {
-          visibility: true,
-          highlight: true,
-          extremes: true,
-        },
-      },
-    ]);
+      ]);
+    }
   }, []);
 
   const setToggle = () => {
