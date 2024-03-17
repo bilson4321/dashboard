@@ -9,7 +9,7 @@ import {
   HIGH_CHART_LAYOUT_KEY,
   dashboardConfig,
 } from "../../constants/dashboard";
-import { AllRocketsQuery } from "../../gql/graphql";
+import { DataPoolConnectorOptions } from "@highcharts/dashboards/es-modules/Data/DataPoolOptions";
 
 LayoutModule(Dashboards);
 
@@ -20,89 +20,91 @@ Dashboards.PluginHandler.addPlugin(Dashboards.HighchartsPlugin);
 Dashboards.PluginHandler.addPlugin(Dashboards.DataGridPlugin);
 
 interface HighChartDashboardProps {
-  data?: AllRocketsQuery;
+  dataPoolOptions: DataPoolConnectorOptions[];
 }
 const HighChartDashboard = (props: HighChartDashboardProps) => {
-  const { data } = props;
+  const { dataPoolOptions } = props;
   const boardRef = useRef<Board | null>(null);
   useEffect(() => {
     const boardOption = localStorage.getItem(HIGH_CHART_LAYOUT_KEY);
+    console.log(
+      "boardOption",
+      boardOption ? JSON.parse(boardOption) : dashboardConfig
+    );
     const board = Dashboards.board(
       "container",
       boardOption ? JSON.parse(boardOption) : dashboardConfig
     );
-    board.importLayoutLocal(HIGH_CHART_LAYOUT_KEY);
     boardRef.current = board;
   }, []);
 
   useEffect(() => {
-    if (boardRef.current && data?.rockets) {
-      boardRef.current.dataPool?.setConnectorOptions({
-        id: "rocket-data",
-        type: "JSON",
-        options: {
-          firstRowAsNames: false,
-          columnNames: ["Name", "Cost", "Payload"],
-          data: data?.rockets?.map((rocket) => [
-            rocket?.name ?? "",
-            rocket?.cost_per_launch ?? 0,
-            rocket?.payload_weights?.reduce((acc, payload) => {
-              const kg = payload?.kg ?? 0;
-              return acc + kg;
-            }, 0) ?? 0,
-          ]),
-        },
+    if (boardRef.current && dataPoolOptions) {
+      dataPoolOptions.forEach((dataPoolOption) => {
+        boardRef.current?.dataPool.setConnectorOptions(dataPoolOption);
       });
-
-      boardRef.current.setComponents([
-        {
-          sync: {
-            visibility: true,
-            highlight: true,
-            extremes: true,
-          },
-          cell: HIGH_CHART_LAYOUT_KEY,
-          id: "rocket-data",
-          type: "DataGrid",
-          connector: {
-            id: "rocket-data",
-          },
-        },
-      ]);
-
-      boardRef.current.setComponents([
-        {
-          sync: {
-            visibility: true,
-            highlight: true,
-            extremes: true,
-          },
-          connector: {
-            id: "rocket-data",
-          },
-          cell: HIGH_CHART_LAYOUT_KEY,
-          type: "Highcharts",
-          columnAssignment: {
-            Name: "x",
-            Cost: "value",
-          },
-          chartOptions: {
-            xAxis: {
-              type: "category",
-              accessibility: {
-                description: "Rockets",
-              },
-            },
-            yAxis: {
-              title: {
-                text: "USD",
-              },
-            },
-          },
-        },
-      ]);
     }
-  }, [data]);
+  }, [dataPoolOptions]);
+
+  useEffect(() => {
+    boardRef.current?.setComponents([
+      {
+        sync: {
+          visibility: true,
+          highlight: true,
+          extremes: true,
+        },
+        cell: HIGH_CHART_LAYOUT_KEY + 0 + 1,
+        id: "rocket-data",
+        type: "DataGrid",
+        connector: {
+          id: "rocket-data",
+        },
+      },
+      {
+        connector: {
+          id: "rocket-data",
+        },
+        cell: HIGH_CHART_LAYOUT_KEY + 0 + 0,
+        type: "Highcharts",
+        columnAssignment: {
+          Name: "x",
+          Cost: "value",
+        },
+        chartOptions: {
+          title: {
+            text: "Rocket Cost",
+          },
+          subtitle: {
+            text: "Rocket cost per launch with payload weight",
+          },
+          xAxis: {
+            type: "category",
+            accessibility: {
+              description: "Rockets",
+            },
+          },
+          yAxis: {
+            title: {
+              text: "USD",
+            },
+          },
+        },
+      },
+      {
+        connector: {
+          id: "dragon-data",
+        },
+        cell: HIGH_CHART_LAYOUT_KEY + 1 + 0,
+        type: "DataGrid",
+        sync: {
+          visibility: true,
+          highlight: true,
+          extremes: true,
+        },
+      },
+    ]);
+  }, []);
 
   const setToggle = () => {
     if (boardRef.current) {
@@ -115,7 +117,6 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
           HIGH_CHART_LAYOUT_KEY,
           JSON.stringify(boardOption)
         );
-        boardRef.current.exportLocal();
       } else {
         boardRef.current.editMode?.activate();
       }
