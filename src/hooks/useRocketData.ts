@@ -5,10 +5,11 @@ import request from "graphql-request";
 const allRocketsDocument = graphql(/* GraphQL */ `
   query allRockets {
     rockets {
-      active
       name
       cost_per_launch
-      first_flight
+      payload_weights {
+        kg
+      }
     }
   }
 `);

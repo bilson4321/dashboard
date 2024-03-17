@@ -36,18 +36,71 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
   }, []);
 
   useEffect(() => {
-    if (boardRef.current) {
+    if (boardRef.current && data?.rockets) {
       boardRef.current.dataPool?.setConnectorOptions({
         id: "rocket-data",
         type: "JSON",
         options: {
-          data:
-            data?.rockets?.map((rocket) => [
-              rocket?.name ?? "",
-              rocket?.cost_per_launch ?? 0,
-            ]) ?? [],
+          firstRowAsNames: false,
+          columnNames: ["Name", "Cost", "Payload"],
+          data: data?.rockets?.map((rocket) => [
+            rocket?.name ?? "",
+            rocket?.cost_per_launch ?? 0,
+            rocket?.payload_weights?.reduce((acc, payload) => {
+              const kg = payload?.kg ?? 0;
+              return acc + kg;
+            }, 0) ?? 0,
+          ]),
         },
       });
+
+      boardRef.current.setComponents([
+        {
+          sync: {
+            visibility: true,
+            highlight: true,
+            extremes: true,
+          },
+          cell: HIGH_CHART_LAYOUT_KEY,
+          id: "rocket-data",
+          type: "DataGrid",
+          connector: {
+            id: "rocket-data",
+          },
+        },
+      ]);
+
+      boardRef.current.setComponents([
+        {
+          sync: {
+            visibility: true,
+            highlight: true,
+            extremes: true,
+          },
+          connector: {
+            id: "rocket-data",
+          },
+          cell: HIGH_CHART_LAYOUT_KEY,
+          type: "Highcharts",
+          columnAssignment: {
+            Name: "x",
+            Cost: "value",
+          },
+          chartOptions: {
+            xAxis: {
+              type: "category",
+              accessibility: {
+                description: "Rockets",
+              },
+            },
+            yAxis: {
+              title: {
+                text: "USD",
+              },
+            },
+          },
+        },
+      ]);
     }
   }, [data]);
 

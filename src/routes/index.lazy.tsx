@@ -29,7 +29,7 @@ function Login() {
               />
             </div>
             <button
-              onClick={() => navigate({ to: "/dashboard" })}
+              onClick={() => navigate({ to: "/home" })}
               className="bg-blue-500 text-white p-2 rounded-lg w-full"
             >
               Login

@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import HighChartDashboard from "../components/board";
 import useRocketData from "../hooks/useRocketData";
 
-export const Route = createFileRoute("/dashboard")({
-  component: Dashboard,
+export const Route = createFileRoute("/home")({
+  component: Home,
 });
 
-function Dashboard() {
+function Home() {
   const { data } = useRocketData();
   return (
     <>
