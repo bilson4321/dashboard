@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import "./style.css";
-
 import Highcharts from "highcharts";
-import Dashboards, { Board } from "@highcharts/dashboards";
+import { useEffect, useRef, useState } from "react";
 import DataGrid from "@highcharts/dashboards/datagrid";
+import Dashboards, { Board } from "@highcharts/dashboards";
+import { ToggleSwitch } from "flowbite-react";
 import LayoutModule from "@highcharts/dashboards/modules/layout";
+import type { DataPoolConnectorOptions } from "@highcharts/dashboards/es-modules/Data/DataPoolOptions";
+
+import "./style.css";
 import {
   HIGH_CHART_LAYOUT_KEY,
   dashboardConfig,
 } from "../../constants/dashboard";
-import { DataPoolConnectorOptions } from "@highcharts/dashboards/es-modules/Data/DataPoolOptions";
-import { ToggleSwitch } from "flowbite-react";
 import { getDataGridConfig } from "../../constants/highchart";
 
 LayoutModule(Dashboards);
@@ -85,6 +85,12 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
               title: {
                 text: "USD",
               },
+              labels: {
+                formatter: function (context) {
+                  // in billion
+                  return parseInt(`${context.value}`) / 1000000000 + "B";
+                },
+              },
             },
           },
         },
@@ -115,15 +121,17 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
 
   return (
     <>
-      <div className="flex justify-end p-4">
-        <ToggleSwitch
-          checked={isEditMode}
-          id="toggle"
-          label="Edit Mode"
-          onChange={setToggle}
-        />
+      <div className="flex justify-end p-4 ">
+        <div className="flex items-center justify-center">
+          <ToggleSwitch
+            checked={isEditMode}
+            id="toggle"
+            label="Edit Mode"
+            onChange={setToggle}
+          />
+        </div>
       </div>
-      <div id="container" />
+      <div id="container" className="highcharts-light" />
     </>
   );
 };

@@ -1,14 +1,17 @@
-import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import "./index.css";
 
-// Import the generated route tree
+import { useAuth } from "./hooks/useAuth";
 import { routeTree } from "./routeTree.gen";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a new router instance
-const router = createRouter({ routeTree, basepath: "/dashboard" });
+const router = createRouter({
+  routeTree,
+  basepath: "/dashboard",
+  defaultPreload: "intent",
+  context: {
+    auth: undefined!,
+  },
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
@@ -17,15 +20,10 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// Render the app
-const rootElement = document.getElementById("root")!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <QueryClientProvider client={new QueryClient()}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </StrictMode>
-  );
-}
+const App = () => {
+  const auth = useAuth();
+
+  return <RouterProvider router={router} context={{ auth }} />;
+};
+
+export default App;

@@ -1,12 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
-import HighChartDashboard from "../components/board";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { DataPoolConnectorOptions } from "@highcharts/dashboards/es-modules/Data/DataPoolOptions";
+
+import Spinner from "../components/spinner";
 import useRocketData from "../hooks/useRocketData";
 import useDragonData from "../hooks/useDragonData";
-import Spinner from "../components/spinner";
-import { DataPoolConnectorOptions } from "@highcharts/dashboards/es-modules/Data/DataPoolOptions";
+import HighChartDashboard from "../components/board";
 
 export const Route = createFileRoute("/home")({
   component: Home,
+  beforeLoad: ({ context, location }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: "/",
+        search: {
+          redirect: location.href,
+        },
+      });
+    }
+  },
 });
 
 function Home() {

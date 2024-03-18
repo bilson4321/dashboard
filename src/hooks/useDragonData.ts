@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { graphql } from "../gql";
 import request from "graphql-request";
+import { useQuery } from "@tanstack/react-query";
+
+import { graphql } from "../gql";
 
 const allDragonsDocument = graphql(/* GraphQL */ `
   query allDragons {
