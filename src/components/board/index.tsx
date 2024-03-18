@@ -131,7 +131,11 @@ const HighChartDashboard = (props: HighChartDashboardProps) => {
           />
         </div>
       </div>
-      <div id="container" className="highcharts-light" />
+      <div
+        id="container"
+        data-testid="container"
+        className="highcharts-light"
+      />
     </>
   );
 };
